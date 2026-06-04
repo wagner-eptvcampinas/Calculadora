@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Calculadora & Timer - PGM-EPTV</title>
+    <style>
+        :root {
+            --accent-color: #ffeb3b;
+            --glass-bg: rgba(20, 20, 20, 0.75);
+            --text-color: #ffffff;
+        }
+
+        body { 
+            font-family: 'Segoe UI', sans-serif; 
+            background: linear-gradient(45deg, #0f2027, #203a43, #2c5364);
+            display: flex; flex-direction: column; align-items: center; 
+            min-height: 100vh; margin: 0; padding: 15px; color: white;
+            transition: 0.5s;
+        }
+
+        .color-bar { display: flex; gap: 10px; margin-bottom: 20px; background: rgba(0,0,0,0.3); padding: 8px 15px; border-radius: 20px; }
+        .dot { width: 12px; height: 12px; border-radius: 50%; cursor: pointer; transition: 0.3s; }
+
+        .mode-switch { 
+            display: flex; background: rgba(0,0,0,0.5); padding: 4px; border-radius: 20px; 
+            margin-bottom: 30px; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1);
+            min-width: 260px; justify-content: space-between;
+        }
+        .mode-btn { 
+            flex: 1; padding: 6px 12px; cursor: pointer; border-radius: 16px; 
+            font-size: 11px; transition: 0.3s; border: none; color: rgba(255,255,255,0.4); 
+            background: none; font-weight: 600;
+        }
+        .mode-btn.active { background: rgba(255,255,255,0.1); color: var(--accent-color); }
+
+        .container { display: flex; gap: 20px; justify-content: center; align-items: flex-start; flex-wrap: wrap; }
+
+        .calc-box { 
+            background: var(--glass-bg); backdrop-filter: blur(20px); 
+            padding: 20px; border-radius: 25px; 
+            border: 1px solid var(--accent-color);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.6); width: 280px;
+            transition: 0.5s;
+        }
+        
+        .display { 
+            background: rgba(0, 0, 0, 0.4); padding: 15px; border-radius: 15px; 
+            margin-bottom: 20px; text-align: right; min-height: 40px;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+        }
+        .main-val { font-size: 28px; font-weight: bold; color: var(--accent-color); font-variant-numeric: tabular-nums; transition: 0.5s; }
+        .ms-val { font-size: 14px; opacity: 0.6; margin-left: 3px; color: var(--accent-color); }
+
+        .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+        
+        button {
+            border: 1px solid rgba(255,255,255,0.05); height: 48px; width: 48px; border-radius: 50%; 
+            cursor: pointer; background: rgba(255, 255, 255, 0.05); color: #fff; 
+            font-weight: bold; font-size: 14px; transition: 0.2s; display: flex; align-items: center; justify-content: center;
+        }
+        button:hover { background: rgba(255, 255, 255, 0.1); border-color: var(--accent-color); }
+        button:active { transform: scale(0.9); }
+        
+        .btn-wide { grid-column: span 2; width: auto; border-radius: 20px; }
+        .btn-equal { background: var(--accent-color); color: #000; border: none; }
+
+        .history {
+            width: 240px; background: var(--glass-bg); backdrop-filter: blur(15px); 
+            border-radius: 20px; padding: 20px; border: 1px solid rgba(255,255,255,0.1); 
+            max-height: 420px; overflow-y: auto;
+        }
+        .hist-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 8px; }
+        .btn-clear { background: none; border: 1px solid rgba(255,255,255,0.2); color: #ccc; cursor: pointer; padding: 3px 8px; font-size: 9px; border-radius: 5px; width: auto; height: auto; }
+    </style>
+</head>
+<body>
+
+<div class="color-bar">
+    <div class="dot" style="background: #ffeb3b;" onclick="mudarCor('#ffeb3b')"></div>
+    <div class="dot" style="background: #448aff;" onclick="mudarCor('#448aff')"></div>
+    <div class="dot" style="background: #4caf50;" onclick="mudarCor('#4caf50')"></div>
+    <div class="dot" style="background: #f44336;" onclick="mudarCor('#f44336')"></div>
+    <div class="dot" style="background: #e91e63;" onclick="mudarCor('#e91e63')"></div>
+    <div class="dot" style="background: #ffffff;" onclick="mudarCor('#ffffff')"></div>
+</div>
+
+<div class="mode-switch">
+    <button id="tab-calc" class="mode-btn active" onclick="setModo('calc')">Calculadora</button>
+    <button id="tab-timer" class="mode-btn" onclick="setModo('timer')">Timer / Cronômetro</button>
+</div>
+
+<div class="container">
+    <div id="view-calc" class="calc-box">
+        <div class="display">
+            <div id="calcOp" style="font-size: 9px; opacity: 0.7; height: 12px; color: #aaa;"></div>
+            <div id="calcDisplay" class="main-val">00:00:00</div>
+        </div>
+        <div class="grid">
+            <button onclick="cLimpar()" class="btn-wide">C</button>
+            <button onclick="cOp('-')">-</button><button onclick="cOp('+')">+</button>
+            <button onclick="cNum(7)">7</button><button onclick="cNum(8)">8</button><button onclick="cNum(9)">9</button>
+            <button onclick="cApagar()">←</button>
+            <button onclick="cNum(4)">4</button><button onclick="cNum(5)">5</button><button onclick="cNum(6)">6</button>
+            <button style="visibility:hidden"></button>
+            <button onclick="cNum(1)">1</button><button onclick="cNum(2)">2</button><button onclick="cNum(3)">3</button>
+            <button style="visibility:hidden"></button>
+            <button onclick="cNum(0)" class="btn-wide">0</button>
+            <button onclick="cIgual()" class="btn-equal btn-wide">=</button>
+        </div>
+    </div>
+
+    <div id="view-timer" class="calc-box" style="display:none">
+        <div class="display">
+            <span id="timerDisplay" class="main-val">00:00:00</span>
+            <span id="timerMs" class="ms-val" style="display:none">.00</span>
+        </div>
+        <div class="grid">
+            <button onclick="tNum(7)">7</button><button onclick="tNum(8)">8</button><button onclick="tNum(9)">9</button>
+            <button onclick="tApagar()">←</button>
+            <button onclick="tNum(4)">4</button><button onclick="tNum(5)">5</button><button onclick="tNum(6)">6</button>
+            <button onclick="tLimpar()">C</button>
+            <button onclick="tNum(1)">1</button><button onclick="tNum(2)">2</button><button onclick="tNum(3)">3</button>
+            <button onclick="tNum(0)">0</button>
+            <button onclick="tToggle()" class="btn-wide btn-equal" id="tPlay">Iniciar</button>
+            <button onclick="tReset()" class="btn-wide">Reset</button>
+        </div>
+    </div>
+
+    <div id="view-history" class="history">
+        <div class="hist-header">
+            <strong style="font-size: 12px; opacity: 0.9;">Histórico</strong>
+            <button onclick="limparHist()" class="btn-clear">Limpar</button>
+        </div>
+        <div id="histLista" style="font-size: 11px; color: #ccc;"></div>
+    </div>
+</div>
+
+<script>
+    function mudarCor(cor) { document.documentElement.style.setProperty('--accent-color', cor); }
+    let modo = 'calc', cBuffer = "", cAnterior = 0, cOpAtiva = null;
+    let tBuffer = "", tTempoMs = 0, tRodando = false, tInterval = null, tRegressivo = false;
+
+    function setModo(m) {
+        modo = m;
+        document.getElementById('tab-calc').classList.toggle('active', m === 'calc');
+        document.getElementById('tab-timer').classList.toggle('active', m === 'timer');
+        document.getElementById('view-calc').style.display = (m === 'calc') ? 'block' : 'none';
+        document.getElementById('view-timer').style.display = (m === 'timer') ? 'block' : 'none';
+        document.getElementById('view-history').style.display = (m === 'calc') ? 'block' : 'none';
+    }
+
+    // --- Atalhos de Teclado ---
+    document.addEventListener('keydown', (e) => {
+        const key = e.key;
+        if (modo === 'calc') {
+            if (key >= '0' && key <= '9') cNum(key);
+            else if (key === '+') cOp('+');
+            else if (key === '-') cOp('-');
+            else if (key === 'Enter' || key === '=') cIgual();
+            else if (key === 'Backspace') cApagar();
+            else if (key === 'Escape' || key.toLowerCase() === 'c') cLimpar();
+        } else {
+            if (key >= '0' && key <= '9') tNum(key);
+            else if (key === 'Enter' || key === ' ') { e.preventDefault(); tToggle(); }
+            else if (key === 'Backspace') tApagar();
+            else if (key === 'Escape' || key.toLowerCase() === 'c') tLimpar();
+            else if (key.toLowerCase() === 'r') tReset();
+        }
+    });
+
+    const vToS = v => { let p = v.split(':').map(Number); return (p[0]*3600)+(p[1]*60)+p[2]; };
+    const sToV = s => { let h=Math.floor(s/3600), m=Math.floor((s%3600)/60), sec=s%60; return [h,m,sec].map(v=>String(v).padStart(2,'0')).join(':'); };
+
+    function cNum(n) { if(cBuffer.length<6){ cBuffer+=n; updateC(); } }
+    function cApagar() { cBuffer=cBuffer.slice(0,-1); updateC(); }
+    function cLimpar() { cBuffer=""; cAnterior=0; cOpAtiva=null; document.getElementById('calcOp').innerText=""; updateC(); }
+    function updateC() { let b=cBuffer.padStart(6,'0'); document.getElementById('calcDisplay').innerText=`${b.slice(0,2)}:${b.slice(2,4)}:${b.slice(4,6)}`; }
+    function cOp(op) { cAnterior=vToS(document.getElementById('calcDisplay').innerText); cOpAtiva=op; document.getElementById('calcOp').innerText=document.getElementById('calcDisplay').innerText+" "+op; cBuffer=""; }
+    function cIgual() {
+        if(!cOpAtiva) return;
+        let res = cOpAtiva==='+' ? cAnterior+vToS(document.getElementById('calcDisplay').innerText) : cAnterior-vToS(document.getElementById('calcDisplay').innerText);
+        let final = sToV(Math.max(0, res));
+        let item = document.createElement('div');
+        item.style.padding='6px 0'; item.style.borderBottom='1px solid rgba(255,255,255,0.05)';
+        item.innerHTML = `${document.getElementById('calcOp').innerText} ${document.getElementById('calcDisplay').innerText} = ${final}`;
+        document.getElementById('histLista').prepend(item);
+        document.getElementById('calcDisplay').innerText=final; cBuffer=""; cOpAtiva=null; document.getElementById('calcOp').innerText="";
+    }
+    function limparHist() { document.getElementById('histLista').innerHTML = ""; }
+
+    function tNum(n) { if(!tRodando && tBuffer.length<6){ tBuffer+=n; updateT(); } }
+    function tApagar() { if(!tRodando){ tBuffer=tBuffer.slice(0,-1); updateT(); } }
+    function tLimpar() { if(!tRodando){ tBuffer=""; updateT(); } }
+    function updateT() {
+        if(!tRodando){
+            let b=tBuffer.padStart(6,'0'); document.getElementById('timerDisplay').innerText=`${b.slice(0,2)}:${b.slice(2,4)}:${b.slice(4,6)}`;
+            document.getElementById('timerMs').style.display='none';
+        } else {
+            let t=Math.max(0, tTempoMs);
+            document.getElementById('timerDisplay').innerText=sToV(Math.floor(t/1000));
+            document.getElementById('timerMs').innerText="."+String(Math.floor((t%1000)/10)).padStart(2,'0');
+            document.getElementById('timerMs').style.display='inline';
+        }
+    }
+    function tToggle() {
+        if(!tRodando) {
+            tTempoMs = vToS(document.getElementById('timerDisplay').innerText)*1000;
+            tRegressivo = tTempoMs>0; tRodando=true; document.getElementById('tPlay').innerText="Pausar";
+            let last = performance.now();
+            tInterval = setInterval(() => {
+                let delta = performance.now()-last; last=performance.now();
+                if(tRegressivo){ tTempoMs-=delta; if(tTempoMs<=0){ tTempoMs=0; clearInterval(tInterval); tRodando=false; document.getElementById('tPlay').innerText="Iniciar"; alert("Fim!"); }}
+                else { tTempoMs+=delta; }
+                updateT();
+            }, 50);
+        } else { clearInterval(tInterval); tRodando=false; document.getElementById('tPlay').innerText="Retomar"; }
+    }
+    function tReset() { clearInterval(tInterval); tRodando=false; tTempoMs=0; tBuffer=""; document.getElementById('tPlay').innerText="Iniciar"; updateT(); }
+</script>
+</body>
+</html>
