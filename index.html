@@ -2,6 +2,7 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Calculadora & Timer - PGM-EPTV</title>
     <style>
         :root {
@@ -16,30 +17,34 @@
             display: flex; flex-direction: column; align-items: center; 
             min-height: 100vh; margin: 0; padding: 15px; color: white;
             transition: 0.5s;
+            box-sizing: border-box;
         }
+
+        * { box-sizing: border-box; }
 
         .color-bar { display: flex; gap: 10px; margin-bottom: 20px; background: rgba(0,0,0,0.3); padding: 8px 15px; border-radius: 20px; }
         .dot { width: 12px; height: 12px; border-radius: 50%; cursor: pointer; transition: 0.3s; }
 
         .mode-switch { 
             display: flex; background: rgba(0,0,0,0.5); padding: 4px; border-radius: 20px; 
-            margin-bottom: 30px; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1);
-            min-width: 260px; justify-content: space-between;
+            margin-bottom: 20px; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1);
+            width: 100%; max-width: 320px; justify-content: space-between;
         }
         .mode-btn { 
-            flex: 1; padding: 6px 12px; cursor: pointer; border-radius: 16px; 
-            font-size: 11px; transition: 0.3s; border: none; color: rgba(255,255,255,0.4); 
+            flex: 1; padding: 10px 12px; cursor: pointer; border-radius: 16px; 
+            font-size: 13px; transition: 0.3s; border: none; color: rgba(255,255,255,0.4); 
             background: none; font-weight: 600;
         }
         .mode-btn.active { background: rgba(255,255,255,0.1); color: var(--accent-color); }
 
-        .container { display: flex; gap: 20px; justify-content: center; align-items: flex-start; flex-wrap: wrap; }
+        .container { display: flex; gap: 20px; justify-content: center; align-items: flex-start; flex-wrap: wrap; width: 100%; max-width: 450px; }
 
         .calc-box { 
             background: var(--glass-bg); backdrop-filter: blur(20px); 
             padding: 20px; border-radius: 25px; 
             border: 1px solid var(--accent-color);
-            box-shadow: 0 15px 40px rgba(0,0,0,0.6); width: 280px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.6); 
+            width: 100%; max-width: 340px;
             transition: 0.5s;
         }
         
@@ -48,29 +53,37 @@
             margin-bottom: 20px; text-align: right; min-height: 40px;
             box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
         }
-        .main-val { font-size: 28px; font-weight: bold; color: var(--accent-color); font-variant-numeric: tabular-nums; transition: 0.5s; }
-        .ms-val { font-size: 14px; opacity: 0.6; margin-left: 3px; color: var(--accent-color); }
+        .main-val { font-size: 32px; font-weight: bold; color: var(--accent-color); font-variant-numeric: tabular-nums; transition: 0.5s; }
+        .ms-val { font-size: 16px; opacity: 0.6; margin-left: 3px; color: var(--accent-color); }
 
-        .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+        .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
         
         button {
-            border: 1px solid rgba(255,255,255,0.05); height: 48px; width: 48px; border-radius: 50%; 
+            border: 1px solid rgba(255,255,255,0.05); height: 55px; width: 100%; border-radius: 50%; 
             cursor: pointer; background: rgba(255, 255, 255, 0.05); color: #fff; 
-            font-weight: bold; font-size: 14px; transition: 0.2s; display: flex; align-items: center; justify-content: center;
+            font-weight: bold; font-size: 16px; transition: 0.2s; display: flex; align-items: center; justify-content: center;
         }
         button:hover { background: rgba(255, 255, 255, 0.1); border-color: var(--accent-color); }
         button:active { transform: scale(0.9); }
         
-        .btn-wide { grid-column: span 2; width: auto; border-radius: 20px; }
+        .btn-wide { grid-column: span 2; border-radius: 25px; }
         .btn-equal { background: var(--accent-color); color: #000; border: none; }
 
         .history {
-            width: 240px; background: var(--glass-bg); backdrop-filter: blur(15px); 
+            width: 100%; max-width: 340px; background: var(--glass-bg); backdrop-filter: blur(15px); 
             border-radius: 20px; padding: 20px; border: 1px solid rgba(255,255,255,0.1); 
-            max-height: 420px; overflow-y: auto;
+            max-height: 250px; overflow-y: auto; margin-top: 10px;
         }
         .hist-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 8px; }
-        .btn-clear { background: none; border: 1px solid rgba(255,255,255,0.2); color: #ccc; cursor: pointer; padding: 3px 8px; font-size: 9px; border-radius: 5px; width: auto; height: auto; }
+        .btn-clear { background: none; border: 1px solid rgba(255,255,255,0.2); color: #ccc; cursor: pointer; padding: 5px 10px; font-size: 11px; border-radius: 5px; width: auto; height: auto; }
+
+        @media (max-width: 480px) {
+            body { padding: 10px; }
+            .container { width: 100%; gap: 15px; }
+            .calc-box, .history, .mode-switch { max-width: 100%; width: 100%; }
+            button { height: 60px; font-size: 18px; } 
+            .main-val { font-size: 36px; }
+        }
     </style>
 </head>
 <body>
@@ -149,7 +162,6 @@
         document.getElementById('view-history').style.display = (m === 'calc') ? 'block' : 'none';
     }
 
-    // --- Atalhos de Teclado ---
     document.addEventListener('keydown', (e) => {
         const key = e.key;
         if (modo === 'calc') {
@@ -168,8 +180,17 @@
         }
     });
 
-    const vToS = v => { let p = v.split(':').map(Number); return (p[0]*3600)+(p[1]*60)+p[2]; };
-    const sToV = s => { let h=Math.floor(s/3600), m=Math.floor((s%3600)/60), sec=s%60; return [h,m,sec].map(v=>String(v).padStart(2,'0')).join(':'); };
+    const vToS = v => { 
+        let p = v.split(':').map(Number); 
+        return (p[0] * 3600) + (p[1] * 60) + p[2]; 
+    };
+    
+    const sToV = s => { 
+        let h = Math.floor(s / 3600);
+        let m = Math.floor((s % 3600) / 60);
+        let sec = s % 60; 
+        return [h, m, sec].map(v => String(v).padStart(2, '0')).join(':'); 
+    };
 
     function cNum(n) { if(cBuffer.length<6){ cBuffer+=n; updateC(); } }
     function cApagar() { cBuffer=cBuffer.slice(0,-1); updateC(); }
