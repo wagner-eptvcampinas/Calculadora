@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Calculadora & Timer - PGM-EPTV</title>
+    <title>Calculadora & Timer</title>
     <style>
         :root {
             --accent-color: #ffeb3b;
@@ -238,5 +238,23 @@
     }
     function tReset() { clearInterval(tInterval); tRodando=false; tTempoMs=0; tBuffer=""; document.getElementById('tPlay').innerText="Iniciar"; updateT(); }
 </script>
+
+
+
+<!-- Código de Registro do PWA -->
+<script>
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('./sw.js')
+            .then(() => console.log('PWA: Service Worker Registrado com Sucesso!'))
+            .catch((err) => console.log('PWA: Erro ao registrar Service Worker:', err));
+    }
+</script>
+
+<!-- Link de vínculo do Manifesto (Cole este também no final, ou dentro da tag <head>) -->
+<link rel="manifest" href="./manifest.json">
+
+
+
+
 </body>
 </html>
