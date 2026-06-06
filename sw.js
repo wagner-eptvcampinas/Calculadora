@@ -1,4 +1,4 @@
-const CACHE_NAME = 'pgm-eptv-v2';
+const CACHE_NAME = 'pgm-eptv-v3';
 
 self.addEventListener('install', (e) => {
   self.skipWaiting();
