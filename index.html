@@ -197,17 +197,33 @@
     function cApagar() { cBuffer=cBuffer.slice(0,-1); updateC(); }
     function cLimpar() { cBuffer=""; cAnterior=0; cOpAtiva=null; document.getElementById('calcOp').innerText=""; updateC(); }
     function updateC() { let b=cBuffer.padStart(6,'0'); document.getElementById('calcDisplay').innerText=`${b.slice(0,2)}:${b.slice(2,4)}:${b.slice(4,6)}`; }
-    function cOp(op) { cAnterior=vToS(document.getElementById('calcDisplay').innerText); cOpAtiva=op; document.getElementById('calcOp').innerText=document.getElementById('calcDisplay').innerText+" "+op; cBuffer=""; }
+    function cOp(op) { 
+        if (cOpAtiva) {
+            let res = cOpAtiva === '+' ? cAnterior + vToS(document.getElementById('calcDisplay').innerText) : cAnterior - vToS(document.getElementById('calcDisplay').innerText);
+            cAnterior = Math.max(0, res);
+            document.getElementById('calcDisplay').innerText = sToV(cAnterior);
+        } else {
+            cAnterior = vToS(document.getElementById('calcDisplay').innerText); 
+        }
+        cOpAtiva = op; 
+        document.getElementById('calcOp').innerText = document.getElementById('calcDisplay').innerText + " " + op; 
+        cBuffer = ""; 
+    }
+
     function cIgual() {
-        if(!cOpAtiva) return;
-        let res = cOpAtiva==='+' ? cAnterior+vToS(document.getElementById('calcDisplay').innerText) : cAnterior-vToS(document.getElementById('calcDisplay').innerText);
+        if (!cOpAtiva) return;
+        let res = cOpAtiva === '+' ? cAnterior + vToS(document.getElementById('calcDisplay').innerText) : cAnterior - vToS(document.getElementById('calcDisplay').innerText);
         let final = sToV(Math.max(0, res));
         let item = document.createElement('div');
-        item.style.padding='6px 0'; item.style.borderBottom='1px solid rgba(255,255,255,0.05)';
+        item.style.padding = '6px 0'; item.style.borderBottom = '1px solid rgba(255,255,255,0.05)';
         item.innerHTML = `${document.getElementById('calcOp').innerText} ${document.getElementById('calcDisplay').innerText} = ${final}`;
         document.getElementById('histLista').prepend(item);
-        document.getElementById('calcDisplay').innerText=final; cBuffer=""; cOpAtiva=null; document.getElementById('calcOp').innerText="";
+        document.getElementById('calcDisplay').innerText = final; 
+        cBuffer = ""; 
+        cOpAtiva = null; 
+        document.getElementById('calcOp').innerText = "";
     }
+    
     function limparHist() { document.getElementById('histLista').innerHTML = ""; }
 
     function tNum(n) { if(!tRodando && tBuffer.length<6){ tBuffer+=n; updateT(); } }
